@@ -1,4 +1,4 @@
-from flask import Flask, request, send_file
+from flask import Flask, request, send_file, make_response
 import os
 
 app = Flask(__name)
@@ -34,7 +34,11 @@ def rename_file():
 @app.route('/download')
 def download_file():
     filename = 'renamed_file.txt'
-    return send_file(os.path.join(app.config['UPLOAD_FOLDER'], filename), as_attachment=True)
+    path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+
+    response = make_response(send_file(path, as_attachment=True, mimetype='application/octet-stream'))
+    response.headers["Content-Disposition"] = f"attachment; filename={filename}"
+    return response
 
 if __name__ == '__main__':
     if not os.path.exists(UPLOAD_FOLDER):
