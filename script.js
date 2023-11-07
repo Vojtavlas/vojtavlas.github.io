@@ -28,6 +28,8 @@ encryptButton.addEventListener('click', async () => {
     const encryptedData = await window.crypto.subtle.encrypt({ name: 'AES-CBC', iv }, cryptoKey, fileBuffer);
 
     const encryptedBlob = new Blob([iv, encryptedData], { type: 'application/octet-stream' });
+    const encryptedFileName = `${selectedFile.name}.aes`;
     downloadLink.href = URL.createObjectURL(encryptedBlob);
+    downloadLink.download = encryptedFileName; // Set the download attribute
     downloadLink.style.display = 'block';
 });
