@@ -1,25 +1,19 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-    <title>File Upload Example</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <title>File Upload and Info</title>
 </head>
+
 <body>
-    <h1>File Upload Example</h1>
-    <form id="file-upload-form" enctype="multipart/form-data">
-        <input type="file" id="file-input" name="file" accept=".txt, .pdf, .doc">
-        <input type="submit" value="Upload File">
-    </form>
-
-    <div id="file-info">
-        <h2>Uploaded File Information</h2>
-        <p>File Name: <span id="file-name"></span></p>
-        <p>File Type: <span id="file-type"></span></p>
-        <p>File Size: <span id="file-size"></span></p>
-    </div>
-
-    <button id="rename-button">Rename File</button>
-    <button id="download-button">Download Renamed File</button>
+    <input type="file" id="fileInput">
+    <div id="fileInfo"></div>
 
     <script src="script.js"></script>
 </body>
+
 </html>
+
