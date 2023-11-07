@@ -1,30 +1,33 @@
 const fileInput = document.getElementById('fileInput');
-const newFileNameInput = document.getElementById('newFileName');
-const downloadButton = document.getElementById('downloadButton');
-const fileInfo = document.getElementById('fileInfo');
-
+const encryptButton = document.getElementById('encryptButton');
+const downloadLink = document.getElementById('downloadLink');
 let selectedFile;
 
 fileInput.addEventListener('change', (event) => {
     selectedFile = event.target.files[0];
     if (selectedFile) {
-        const fileName = selectedFile.name;
-        const fileSize = Math.round(selectedFile.size / 1024) + ' KB';
-        const fileType = selectedFile.type || 'n/a';
-        fileInfo.textContent = `File Name: ${fileName}\nFile Size: ${fileSize}\nFile Type: ${fileType}`;
-        downloadButton.disabled = false;
+        encryptButton.disabled = false;
     } else {
-        fileInfo.textContent = 'No file selected';
-        downloadButton.disabled = true;
+        encryptButton.disabled = true;
     }
 });
 
-downloadButton.addEventListener('click', () => {
-    if (selectedFile) {
-        const newFileName = newFileNameInput.value || selectedFile.name;
-        const downloadLink = document.createElement('a');
-        downloadLink.href = URL.createObjectURL(selectedFile);
-        downloadLink.download = newFileName;
-        downloadLink.click();
+encryptButton.addEventListener('click', async () => {
+    if (!selectedFile) {
+        return;
     }
+
+    const password = prompt('Enter a password for encryption:');
+    if (!password) {
+        return;
+    }
+
+    const fileBuffer = await selectedFile.arrayBuffer();
+    const cryptoKey = await window.crypto.subtle.importKey('raw', new TextEncoder().encode(password), 'AES-CBC', false, ['encrypt']);
+    const iv = window.crypto.getRandomValues(new Uint8Array(16));
+    const encryptedData = await window.crypto.subtle.encrypt({ name: 'AES-CBC', iv }, cryptoKey, fileBuffer);
+
+    const encryptedBlob = new Blob([iv, encryptedData], { type: 'application/octet-stream' });
+    downloadLink.href = URL.createObjectURL(encryptedBlob);
+    downloadLink.style.display = 'block';
 });
