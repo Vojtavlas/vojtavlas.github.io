@@ -4,19 +4,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles.css">
-    <title>File Upload, Rename, and Download</title>
+    <title>AES File Encryption</title>
 </head>
 
 <body>
     <input type="file" id="fileInput">
-    <input type="text" id="newFileName" placeholder="Enter new file name">
-    <button id="downloadButton" disabled>Download File</button>
-    <div id="fileInfo"></div>
+    <button id="encryptButton" disabled>Encrypt File</button>
+    <a id="downloadLink" style="display: none" download="encrypted_file.aes">Download Encrypted File</a>
 
     <script src="script.js"></script>
 </body>
 
 </html>
-
-
