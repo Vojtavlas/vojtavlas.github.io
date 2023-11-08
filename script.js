@@ -10,7 +10,7 @@ fileInput.addEventListener('change', (event) => {
     if (selectedFile) {
         encryptButton.disabled = false;
         copyKeyButton.disabled = true;
-        keyDisplay.textContent = 'Key: Hard-codedDemoKey';
+        keyDisplay.textContent = 'Generating key...';
     } else {
         encryptButton.disabled = true;
         copyKeyButton.disabled = true;
@@ -23,11 +23,24 @@ encryptButton.addEventListener('click', async () => {
         return;
     }
 
-    const keyHex = 'Hard-codedDemoKey';
+    const key = await window.crypto.subtle.generateKey(
+        {
+            name: 'AES-CBC',
+            length: 256
+        },
+        true,
+        ['encrypt', 'decrypt']
+    );
+
+    const keyBuffer = await window.crypto.subtle.exportKey('raw', key);
+    const keyArray = Array.from(new Uint8Array(keyBuffer));
+    const keyHex = keyArray.map(byte => byte.toString(16).padStart(2, '0')).join('');
+    keyDisplay.textContent = 'Encryption Key: ' + keyHex;
+    copyKeyButton.disabled = false;
 
     const iv = window.crypto.getRandomValues(new Uint8Array(16));
     const fileBuffer = await selectedFile.arrayBuffer();
-    const encryptedData = await window.crypto.subtle.encrypt({ name: 'AES-CBC', iv }, new TextEncoder().encode(keyHex), fileBuffer);
+    const encryptedData = await window.crypto.subtle.encrypt({ name: 'AES-CBC', iv }, key, fileBuffer);
 
     const encryptedBlob = new Blob([iv, encryptedData], { type: 'application/octet-stream' });
     const encryptedFileName = `${selectedFile.name}.aes`;
@@ -37,7 +50,7 @@ encryptButton.addEventListener('click', async () => {
 });
 
 copyKeyButton.addEventListener('click', () => {
-    const keyHex = 'Hard-codedDemoKey';
+    const keyHex = keyDisplay.textContent.split(': ')[1];
     const textarea = document.createElement('textarea');
     textarea.value = keyHex;
     document.body.appendChild(textarea);
