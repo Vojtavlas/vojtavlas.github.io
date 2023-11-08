@@ -3,9 +3,9 @@ const encryptButton = document.getElementById('encryptButton');
 const decryptButton = document.getElementById('decryptButton');
 const downloadLink = document.getElementById('downloadLink');
 const keyDisplay = document.getElementById('keyDisplay');
+const customKeyInput = document.getElementById('customKey');
 const copyKeyButton = document.getElementById('copyKeyButton');
 let selectedFile;
-let encryptionMode = true;
 
 fileInput.addEventListener('change', (event) => {
     selectedFile = event.target.files[0];
@@ -23,46 +23,62 @@ fileInput.addEventListener('change', (event) => {
 });
 
 encryptButton.addEventListener('click', async () => {
-    encryptionMode = true;
-    processFile();
+    decryptButton.disabled = true;
+    processFile(false);
 });
 
 decryptButton.addEventListener('click', async () => {
-    encryptionMode = false;
-    processFile();
+    encryptButton.disabled = true;
+    processFile(true);
 });
 
-async function processFile() {
+customKeyInput.addEventListener('input', () => {
+    keyDisplay.textContent = '';
+    copyKeyButton.disabled = true;
+});
+
+async function processFile(decryptionMode) {
     if (!selectedFile) {
         return;
     }
 
-    const key = await window.crypto.subtle.generateKey(
-        {
-            name: 'AES-CBC',
-            length: 256
-        },
+    const keyHex = customKeyInput.value;
+
+    if (!keyHex) {
+        keyDisplay.textContent = 'Custom key is required';
+        return;
+    }
+
+    const keyData = new TextEncoder().encode(keyHex);
+
+    if (keyData.length !== 32) { // 256-bit key length
+        keyDisplay.textContent = 'Custom key must be 32 characters (256 bits)';
+        return;
+    }
+
+    const key = await window.crypto.subtle.importKey(
+        'raw',
+        keyData,
+        { name: 'AES-CBC' },
         true,
         ['encrypt', 'decrypt']
     );
 
-    const keyBuffer = await window.crypto.subtle.exportKey('raw', key);
-    const keyArray = Array.from(new Uint8Array(keyBuffer));
-    const keyHex = keyArray.map(byte => byte.toString(16).padStart(2, '0')).join('');
     keyDisplay.textContent = 'Key: ' + keyHex;
     copyKeyButton.disabled = false;
 
     const iv = window.crypto.getRandomValues(new Uint8Array(16));
     const fileBuffer = await selectedFile.arrayBuffer();
     let data;
-    if (encryptionMode) {
-        data = await window.crypto.subtle.encrypt({ name: 'AES-CBC', iv }, key, fileBuffer);
-    } else {
+
+    if (decryptionMode) {
         data = await window.crypto.subtle.decrypt({ name: 'AES-CBC', iv }, key, fileBuffer);
+    } else {
+        data = await window.crypto.subtle.encrypt({ name: 'AES-CBC', iv }, key, fileBuffer);
     }
 
-    const blobType = encryptionMode ? 'application/octet-stream' : selectedFile.type;
-    const fileName = encryptionMode ? `${selectedFile.name}.aes` : selectedFile.name.replace('.aes', '');
+    const blobType = decryptionMode ? selectedFile.type : 'application/octet-stream';
+    const fileName = decryptionMode ? selectedFile.name.replace('.aes', '') : `${selectedFile.name}.aes`;
     downloadLink.href = URL.createObjectURL(new Blob([iv, data], { type: blobType }));
     downloadLink.download = fileName;
     downloadLink.style.display = 'block';
