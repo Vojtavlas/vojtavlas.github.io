@@ -8,6 +8,14 @@ body {
     margin: 0;
 }
 
-#fileInfo {
-    margin-top: 20px;
+#fileInput {
+    margin-bottom: 10px;
+}
+
+#keyDisplay {
+    margin-top: 10px;
+}
+
+#copyKeyButton {
+    margin-top: 10px;
 }
