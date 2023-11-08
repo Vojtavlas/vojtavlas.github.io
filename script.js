@@ -24,11 +24,13 @@ fileInput.addEventListener('change', (event) => {
 
 encryptButton.addEventListener('click', async () => {
     decryptButton.disabled = true;
+    copyKeyButton.disabled = false; // Enable copy button for encryption
     processFile(false);
 });
 
 decryptButton.addEventListener('click', async () => {
     encryptButton.disabled = true;
+    copyKeyButton.disabled = true; // Disable copy button for decryption
     processFile(true);
 });
 
@@ -65,7 +67,6 @@ async function processFile(decryptionMode) {
     );
 
     keyDisplay.textContent = 'Key: ' + keyHex;
-    copyKeyButton.disabled = false;
 
     const iv = window.crypto.getRandomValues(new Uint8Array(16));
     const fileBuffer = await selectedFile.arrayBuffer();
