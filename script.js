@@ -39,6 +39,18 @@ customKeyInput.addEventListener('input', () => {
     copyKeyButton.disabled = true;
 });
 
+async function generateKey() {
+    const key = await window.crypto.subtle.generateKey(
+        {
+            name: 'AES-CBC',
+            length: 256
+        },
+        true,
+        ['encrypt', 'decrypt']
+    );
+    return key;
+}
+
 async function processFile(decryptionMode) {
     if (!selectedFile) {
         return;
@@ -84,3 +96,8 @@ async function processFile(decryptionMode) {
     downloadLink.download = fileName;
     downloadLink.style.display = 'block';
 }
+
+// Generate key when the page loads
+generateKey().then(() => {
+    keyDisplay.textContent = 'Generating key...';
+});
