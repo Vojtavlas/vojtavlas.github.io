@@ -1,3 +1,24 @@
+window.onload = async function() {
+    const key = await generateKey();
+    const keyBuffer = await window.crypto.subtle.exportKey('raw', key);
+    const keyArray = Array.from(new Uint8Array(keyBuffer));
+    const keyHex = keyArray.map(byte => byte.toString(16).padStart(2, '0')).join('');
+    keyDisplay.textContent = 'Key: ' + keyHex;
+    copyKeyButton.disabled = false;
+};
+
+async function generateKey() {
+    const key = await window.crypto.subtle.generateKey(
+        {
+            name: 'AES-CBC',
+            length: 256
+        },
+        true,
+        ['encrypt', 'decrypt']
+    );
+    return key;
+}
+
 const fileInput = document.getElementById('fileInput');
 const encryptButton = document.getElementById('encryptButton');
 const decryptButton = document.getElementById('decryptButton');
@@ -13,7 +34,7 @@ fileInput.addEventListener('change', (event) => {
         encryptButton.disabled = false;
         decryptButton.disabled = false;
         copyKeyButton.disabled = true;
-        keyDisplay.textContent = 'Generating key...';
+        keyDisplay.textContent = 'Key: Click "Copy Key"';
     } else {
         encryptButton.disabled = true;
         decryptButton.disabled = true;
@@ -35,21 +56,9 @@ decryptButton.addEventListener('click', async () => {
 });
 
 customKeyInput.addEventListener('input', () => {
-    keyDisplay.textContent = '';
-    copyKeyButton.disabled = true;
+    keyDisplay.textContent = 'Key: ' + customKeyInput.value;
+    copyKeyButton.disabled = false;
 });
-
-async function generateKey() {
-    const key = await window.crypto.subtle.generateKey(
-        {
-            name: 'AES-CBC',
-            length: 256
-        },
-        true,
-        ['encrypt', 'decrypt']
-    );
-    return key;
-}
 
 async function processFile(decryptionMode) {
     if (!selectedFile) {
