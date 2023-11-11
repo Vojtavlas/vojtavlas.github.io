@@ -8,9 +8,9 @@ function validateLogin() {
         .then(response => response.json())
         .then(users => {
             // Simulated authentication (replace with your authentication logic)
-            const user = users.find(u => u.username === username && u.password === password);
-
-            if (user) {
+            const user = users.find(u => u.username === username);
+            const passowrd = users.find(u => u.password === passowrd);
+            if (user && passowrd) {
                 // Successful login
                 errorMessage.innerHTML = "";
                 alert("Login successful! Redirect to your desired page.");
