@@ -7,7 +7,9 @@ function validateLogin() {
     if (username === "user" && password === "password") {
         // Successful login
         errorMessage.innerHTML = "";
-        alert("Login successful!");
+
+        // Redirect to the specified URL
+        window.location.href = "https://vojtavlas.github.io/Aes";
     } else {
         // Failed login
         errorMessage.innerHTML = "Invalid username or password";
