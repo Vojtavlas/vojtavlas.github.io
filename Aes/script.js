@@ -1,55 +1,112 @@
-const fileInput = document.getElementById("file-input");
-const fileInfo = document.getElementById("file-info");
-const fileName = document.getElementById("file-name");
-const fileType = document.getElementById("file-type");
-const fileSize = document.getElementById("file-size");
-const renameButton = document.getElementById("rename-button");
-const downloadButton = document.getElementById("download-button");
+window.onload = async function() {
+    const key = await generateKey();
+    const keyBuffer = await window.crypto.subtle.exportKey('raw', key);
+    const keyArray = Array.from(new Uint8Array(keyBuffer));
+    const keyHex = keyArray.map(byte => byte.toString(16).padStart(2, '0')).join('');
+    keyDisplay.textContent = 'Key: ' + keyHex;
+    copyKeyButton.disabled = false;
+};
 
-document.getElementById("file-upload-form").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const formData = new FormData();
-    formData.append("file", fileInput.files[0]);
-
-    try {
-        const response = await fetch("/upload", {
-            method: "POST",
-            body: formData,
-        });
-
-        if (response.ok) {
-            displayFileInfo();
-        }
-    } catch (error) {
-        console.error("Error uploading file: " + error);
-    }
-});
-
-renameButton.addEventListener("click", async () => {
-    try {
-        const response = await fetch("/rename", {
-            method: "GET",
-        });
-
-        if (response.ok) {
-            alert("File renamed successfully");
-        }
-    } catch (error) {
-        console.error("Error renaming file: " + error);
-    }
-});
-
-downloadButton.addEventListener("click", () => {
-    window.location.href = "/download";
-});
-
-function displayFileInfo() {
-    const file = fileInput.files[0];
-    if (file) {
-        fileName.textContent = file.name;
-        fileType.textContent = file.type;
-        fileSize.textContent = (file.size / 1024).toFixed(2) + " KB";
-    } else {
-        fileInfo.innerHTML = "<p>No file selected.</p>";
-    }
+async function generateKey() {
+    const key = await window.crypto.subtle.generateKey(
+        {
+            name: 'AES-CBC',
+            length: 256
+        },
+        true,
+        ['encrypt', 'decrypt']
+    );
+    return key;
 }
+
+const fileInput = document.getElementById('fileInput');
+const encryptButton = document.getElementById('encryptButton');
+const decryptButton = document.getElementById('decryptButton');
+const downloadLink = document.getElementById('downloadLink');
+const keyDisplay = document.getElementById('keyDisplay');
+const customKeyInput = document.getElementById('customKey');
+const copyKeyButton = document.getElementById('copyKeyButton');
+let selectedFile;
+
+fileInput.addEventListener('change', (event) => {
+    selectedFile = event.target.files[0];
+    if (selectedFile) {
+        encryptButton.disabled = false;
+        decryptButton.disabled = false;
+        copyKeyButton.disabled = true;
+        keyDisplay.textContent = 'Key: Click "Copy Key"';
+    } else {
+        encryptButton.disabled = true;
+        decryptButton.disabled = true;
+        copyKeyButton.disabled = true;
+        keyDisplay.textContent = '';
+    }
+});
+
+encryptButton.addEventListener('click', async () => {
+    decryptButton.disabled = true;
+    copyKeyButton.disabled = false; // Enable copy button for encryption
+    processFile(false);
+});
+
+decryptButton.addEventListener('click', async () => {
+    encryptButton.disabled = true;
+    copyKeyButton.disabled = true; // Disable copy button for decryption
+    processFile(true);
+});
+
+customKeyInput.addEventListener('input', () => {
+    keyDisplay.textContent = 'Key: ' + customKeyInput.value;
+    copyKeyButton.disabled = false;
+});
+
+async function processFile(decryptionMode) {
+    if (!selectedFile) {
+        return;
+    }
+
+    const keyHex = customKeyInput.value;
+
+    if (!keyHex) {
+        keyDisplay.textContent = 'Custom key is required';
+        return;
+    }
+
+    const keyData = new TextEncoder().encode(keyHex);
+
+    if (keyData.length !== 32) { // 256-bit key length
+        keyDisplay.textContent = 'Custom key must be 32 characters (256 bits)';
+        return;
+    }
+
+    const key = await window.crypto.subtle.importKey(
+        'raw',
+        keyData,
+        { name: 'AES-CBC' },
+        true,
+        ['encrypt', 'decrypt']
+    );
+
+    keyDisplay.textContent = 'Key: ' + keyHex;
+
+    const iv = window.crypto.getRandomValues(new Uint8Array(16));
+    const fileBuffer = await selectedFile.arrayBuffer();
+    let data;
+
+    if (decryptionMode) {
+        data = await window.crypto.subtle.decrypt({ name: 'AES-CBC', iv }, key, fileBuffer);
+    } else {
+        data = await window.crypto.subtle.encrypt({ name: 'AES-CBC', iv }, key, fileBuffer);
+    }
+
+    const blobType = decryptionMode ? selectedFile.type : 'application/octet-stream';
+    const fileName = decryptionMode ? selectedFile.name.replace('.aes', '') : `${selectedFile.name}.aes`;
+    downloadLink.href = URL.createObjectURL(new Blob([iv, data], { type: blobType }));
+    downloadLink.download = fileName;
+    downloadLink.style.display = 'block';
+}
+
+// Generate key when the page loads
+generateKey().then(() => {
+    keyDisplay.textContent = 'Generating key...';
+});

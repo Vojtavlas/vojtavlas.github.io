@@ -1,0 +1,90 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #f0f0f0;
+}
+
+#fileInput {
+    margin-bottom: 10px;
+    font-size: 16px;
+    padding: 5px;
+}
+
+#encryptButton {
+    background-color: #007BFF;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+#encryptButton:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+#encryptButton:hover:enabled {
+    background-color: #0056b3;
+}
+
+#decryptButton {
+    background-color: #28a745;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+#decryptButton:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+#decryptButton:hover:enabled {
+    background-color: #1e7e34;
+}
+
+#downloadLink {
+    margin-top: 10px;
+    text-decoration: none;
+    color: #007BFF;
+    font-weight: bold;
+}
+
+#keyDisplay {
+    margin-top: 10px;
+    font-size: 18px;
+    text-align: center;
+    color: #333;
+}
+
+#copyKeyButton {
+    background-color: #007BFF;
+    color: #fff;
+    padding: 5px 10px;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+#copyKeyButton:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+#copyKeyButton:hover:enabled {
+    background-color: #0056b3;
+}
