@@ -1,6 +1,6 @@
 function validateLogin() {
     var username = document.getElementById("username").value;
-    var password = document.getElementById("password").value;
+    var passwrd = document.getElementById("password").value;
     var errorMessage = document.getElementById("error-message");
 
     // Fetch user data from a JSON file (replace with your JSON file path)
@@ -9,7 +9,7 @@ function validateLogin() {
         .then(users => {
             // Simulated authentication (replace with your authentication logic)
             const user = users.find(u => u.username === username);
-            const passowrd = users.find(u => u.password === passowrd);
+            const password = users.find(u => u.password === passwrd);
             if (user && password) {
                 // Successful login
                 errorMessage.innerHTML = "";
