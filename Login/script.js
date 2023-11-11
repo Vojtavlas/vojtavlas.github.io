@@ -10,7 +10,7 @@ function validateLogin() {
             // Simulated authentication (replace with your authentication logic)
             const user = users.find(u => u.username === username);
             const passowrd = users.find(u => u.password === passowrd);
-            if (user && passowrd) {
+            if (user && password) {
                 // Successful login
                 errorMessage.innerHTML = "";
                 alert("Login successful! Redirect to your desired page.");
