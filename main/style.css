@@ -1,3 +1,6 @@
 .url{
-    padding-bottom: 10px;
+    color: white;
+    background-color: rgb(0, 119, 255);
+    border: 10px;
+    border-color: black;
 }
