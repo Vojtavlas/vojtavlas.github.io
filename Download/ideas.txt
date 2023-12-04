@@ -1,0 +1,12 @@
+Hard -----
+Network Packet Sniffer
+Secure VoIP Communication
+Secure Remote Desktop Access
+Network Access Control (NAC) System
+Firewall/Intrusion Detection System (IDS)
+Blockchain Analysis Tool
+Easy -----
+URL Link Checker
+PDF Text Extractor
+Automated Unit Converter
+
